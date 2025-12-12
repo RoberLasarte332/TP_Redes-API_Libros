@@ -3,12 +3,18 @@
 Simple CLI client that uses `requests` to interact with the FastAPI Books API.
 
 Usage examples:
-  python requests_client.py list --base http://127.0.0.1:8000
-  python requests_client.py get 2 --base http://127.0.0.1:8000
-  python requests_client.py add --title "Libro" --author "Autor" --base http://127.0.0.1:8000 --user admin --pass password
-  python requests_client.py delete 3 --base http://127.0.0.1:8000 --user admin --pass password
-  python requests_client.py stats --base http://127.0.0.1:8000
-  python requests_client.py authors --base http://127.0.0.1:8000
+  python requests_client.py --base http://127.0.0.1:8000 list
+
+  python requests_client.py --base http://127.0.0.1:8000 get 2
+
+  python requests_client.py --base http://127.0.0.1:8000 --user admin --pass password add --title "Libro"
+
+  python requests_client.py --base http://127.0.0.1:8000 --user admin --pass password delete 100
+
+  python requests_client.py --base http://127.0.0.1:8000 stats
+
+  python requests_client.py --base http://127.0.0.1:8000 authors
+
 """
 import argparse
 import json
