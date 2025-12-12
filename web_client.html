@@ -1,171 +1,87 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>Books API Web Client</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    input, button, textarea { margin: 4px 0; display:block; }
-    .book { border-bottom: 1px solid #ddd; padding: 6px 0; }
-  </style>
+  <link rel="stylesheet" href="web_client.css" />
 </head>
-<body>
-  <h1>Books API - Web Client</h1>
 
+<body>
+  <h1>📚 Books API – Web Client</h1>
+
+  <!-- CONFIG -->
   <section>
-    <h3>Config</h3>
-    <label>API Base URL: <input id="baseUrl" value="http://127.0.0.1:8000"></label>
-    <label>User: <input id="user" value="admin"></label>
-    <label>Password: <input id="pass" value="password" type="password"></label>
-    <div id="status" style="margin-top:8px;color:darkgreen"></div>
+    <h3>Configuración</h3>
+
+    <div class="field">
+      <label>API Base URL:</label>
+      <input id="baseUrl" value="http://127.0.0.1:8000" />
+    </div>
+
+    <div class="field">
+      <label>Usuario:</label>
+      <input id="user" value="admin" />
+    </div>
+
+    <div class="field">
+      <label>Contraseña:</label>
+      <input id="pass" value="password" type="password" />
+    </div>
+
+    <div id="status"></div>
   </section>
 
+  <!-- LIST BOOKS -->
   <section>
-    <h3>List books</h3>
-    <button id="btnList">Listar libros</button>
+    <h3>Listar libros</h3>
+
+    <div class="grid-2">
+      <div class="field"><label>Título:</label><input id="filterTitle"></div>
+      <div class="field"><label>Autor:</label><input id="filterAuthor"></div>
+
+      <div class="field"><label>Idioma:</label><input id="filterLanguage"></div>
+      <div class="field"><label>País:</label><input id="filterCountry"></div>
+
+      <div class="field"><label>Páginas mín.:</label><input id="filterPagesMin" type="number"></div>
+      <div class="field"><label>Páginas máx.:</label><input id="filterPagesMax" type="number"></div>
+    </div>
+
+    <div class="btn-row">
+      <button id="btnList">Listar</button>
+      <button id="btnClearFilters" class="secondary">Limpiar</button>
+    </div>
+
     <div id="books"></div>
   </section>
 
+  <!-- ADD BOOK -->
   <section>
-    <h3>Add book</h3>
-    <label>Title: <input id="title"></label>
-    <label>Author: <input id="author"></label>
-    <label>Pages: <input id="pages" type="number"></label>
-    <label>Language: <input id="language"></label>
-    <button id="btnAdd">Agregar libro</button>
+    <h3>Agregar libro</h3>
+
+    <div class="field">
+      <label>Título:</label>
+      <input id="title" />
+    </div>
+
+    <div class="field">
+      <label>Autor:</label>
+      <input id="author" />
+    </div>
+
+    <div class="field">
+      <label>Páginas:</label>
+      <input id="pages" type="number" />
+    </div>
+
+    <div class="field">
+      <label>Idioma:</label>
+      <input id="language" />
+    </div>
+
+    <button id="btnAdd">Agregar</button>
     <div id="addResult"></div>
   </section>
 
-  <script>
-    function authHeader(user, pass) {
-      return 'Basic ' + btoa(user + ':' + pass);
-    }
-
-    function setStatus(msg, isError=false) {
-      const s = document.getElementById('status');
-      if(!s) return;
-      s.textContent = msg;
-      s.style.color = isError ? 'darkred' : 'darkgreen';
-    }
-
-    async function listBooks() {
-      const base = document.getElementById('baseUrl').value;
-      setStatus('Cargando libros...');
-      try {
-        const res = await fetch(base + '/books');
-        if(!res.ok) {
-          const t = await res.text().catch(()=>res.statusText || 'error');
-          setStatus('Error listando: ' + res.status + ' ' + t, true);
-          return;
-        }
-        const data = await res.json();
-        const container = document.getElementById('books');
-        container.innerHTML = '';
-        // Normalize response: API may return an array or an object {Cantidad, Libros}
-        let booksArray = [];
-        let total = 0;
-        if (Array.isArray(data)) {
-          booksArray = data;
-          total = data.length;
-        } else if (data && (data.Libros || data.libros)) {
-          booksArray = data.Libros || data.libros || [];
-          total = data.Cantidad || booksArray.length;
-        } else {
-          // unknown shape
-          setStatus('Respuesta inesperada del API', true);
-          console.error('Unexpected /books response', data);
-          container.textContent = 'No hay libros.';
-          return;
-        }
-        if (booksArray.length === 0) {
-          container.textContent = 'No hay libros.';
-          setStatus('Listo — 0 libros.');
-          return;
-        }
-        booksArray.forEach((b, idx) => {
-          const div = document.createElement('div');
-          div.className = 'book';
-          div.innerHTML = `<strong>${b.title}</strong> — ${b.author || '—'}
-                           <br>Pages: ${b.pages || '—'} — Lang: ${b.language || '—'}
-                           <br><button data-idx="${idx}" class="del">Borrar (index ${idx})</button>`;
-          container.appendChild(div);
-        });
-        // attach delete handlers
-        document.querySelectorAll('.del').forEach(btn=>{
-          btn.removeEventListener('click', btn._delHandler);
-          const handler = async (ev)=>{
-            const idx = btn.getAttribute('data-idx');
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
-            const headers = { 'Authorization': authHeader(user, pass) };
-            setStatus('Eliminando libro...');
-            try {
-              const dres = await fetch(document.getElementById('baseUrl').value + '/books/' + idx, { method: 'DELETE', headers });
-              if(!dres.ok) {
-                const t = await dres.text().catch(()=>dres.statusText || 'error');
-                setStatus('Error delete: ' + dres.status + ' ' + t, true);
-                return;
-              }
-              const j = await dres.json().catch(()=>({error:'no-json'}));
-              alert('Delete result: ' + JSON.stringify(j));
-              setStatus('Eliminado. Actualizando lista...');
-              listBooks();
-            } catch(err) {
-              console.error(err);
-              setStatus('Error en delete: ' + err.message, true);
-            }
-          };
-          btn._delHandler = handler;
-          btn.addEventListener('click', handler);
-        });
-        setStatus('Listo — ' + total + ' libros.');
-      } catch (err) {
-        console.error(err);
-        setStatus('Fetch error: ' + err.message, true);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.getElementById('btnList').addEventListener('click', listBooks);
-
-      document.getElementById('btnAdd').addEventListener('click', async ()=>{
-        const base = document.getElementById('baseUrl').value;
-        const user = document.getElementById('user').value;
-        const pass = document.getElementById('pass').value;
-        const payload = {
-          title: document.getElementById('title').value,
-          author: document.getElementById('author').value || null,
-          pages: parseInt(document.getElementById('pages').value) || null,
-          language: document.getElementById('language').value || null
-        };
-        setStatus('Agregando libro...');
-        try {
-          const res = await fetch(base + '/books', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': authHeader(user, pass)
-            },
-            body: JSON.stringify(payload)
-          });
-          if(!res.ok) {
-            const t = await res.text().catch(()=>res.statusText || 'error');
-            setStatus('Error add: ' + res.status + ' ' + t, true);
-            return;
-          }
-          const j = await res.json().catch(()=>({error: 'no-json'}));
-          document.getElementById('addResult').textContent = JSON.stringify(j);
-          setStatus('Agregado. Actualizando lista...');
-          listBooks();
-        } catch(err) {
-          console.error(err);
-          setStatus('Error agregar: ' + err.message, true);
-        }
-      });
-
-      // auto-list on load
-      listBooks();
-    });
-  </script>
+  <script src="client.js"></script>
 </body>
 </html>

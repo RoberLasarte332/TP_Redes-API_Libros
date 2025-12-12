@@ -7,6 +7,7 @@ Resumen rápido
 - Persistencia: `books.json` (archivo JSON usado como almacenamiento en este prototipo).
 - Seguridad: autenticación básica (env: `API_USER`/`API_PASS`) y limitador de requests en memoria (`RATE_LIMIT_RPS`).
 - Frontend de prueba: `web_client.html` (interfaz estática para pruebas).
+  - Cliente Python de ejemplo: `requests_client.py` (usa la librería `requests` para hacer llamadas a la API).
 
 Recomendaciones y pasos de despliegue
 ------------------------------------
@@ -14,9 +15,9 @@ Recomendaciones y pasos de despliegue
    - Crear y usar un virtualenv local (no versionar `.venv`):
      ```powershell
      python -m venv .venv
-     .\.venv\Scripts\python -m pip install --upgrade pip
-     .\.venv\Scripts\python -m pip install fastapi uvicorn pydantic
-     .\.venv\Scripts\python -m pip freeze > requirements.txt
+     .\.venv\Scripts\Activate.ps1
+     python -m pip install --upgrade pip
+     pip install -r requirements.txt
      ```
 
 2) Configuración por variables de entorno
@@ -95,3 +96,16 @@ Recomendaciones y pasos de despliegue
    - Para entornos con múltiples procesos/instancias, usar Redis/central store para rate limiting.
 
 Fin del README.
+
+Cliente Python `requests`
+-------------------------
+Un pequeño cliente de ejemplo está disponible en `requests_client.py`. Requiere instalar `requests` (ya incluido en `requirements.txt`). Ejemplos:
+``powershell
+python requests_client.py list --base http://127.0.0.1:8000
+python requests_client.py list --base http://127.0.0.1:8000 --author "Jane Austen"
+python requests_client.py get 2 --base http://127.0.0.1:8000
+python requests_client.py add --title "Mi libro" --author "Yo" --pages 123 --base http://127.0.0.1:8000 --user admin --pass password
+python requests_client.py delete 3 --base http://127.0.0.1:8000 --user admin --pass password
+``
+
+Este cliente demuestra la librería `requests` y cumple la consignainvestigar y usar FastAPI, `requests` y `uvicorn`.

@@ -1,0 +1,103 @@
+body {
+  font-family: Georgia, serif;
+  padding-bottom: 50px;
+  background: #f4eee2;
+  color: #3a2f2a;
+}
+
+h1 {
+  text-align: center;
+  font-size: 32px;
+  padding: 20px;
+  border-bottom: 2px solid #d6c6a8;
+}
+
+section {
+  background: #fffaf1;
+  width: 700px;
+  margin: 25px auto;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #e0d4b8;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+h3 {
+  margin-top: 0;
+  border-left: 4px solid #c6a667;
+  padding-left: 10px;
+  color: #6b4e3d;
+}
+
+.field {
+  margin-bottom: 12px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #c6b89e;
+}
+
+button {
+  background: #b48a4a;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #7b6a58;
+}
+
+button:hover {
+  background: #9e7c3e;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.book {
+  background: #fff4e0;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #d6c4a6;
+  margin-bottom: 12px;
+}
+
+.book strong {
+  font-size: 18px;
+  color: #3c2d23;
+}
+
+#status {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.del-btn {
+  background: #a75b4e;
+  margin-top: 10px;
+}
+
+.del-btn:hover {
+  background: #8f4b40;
+}
