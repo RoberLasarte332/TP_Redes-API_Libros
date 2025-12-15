@@ -1,111 +1,106 @@
 Proyecto: API de Libros Clásicos
-=================================
+================================
 
-Resumen rápido
---------------
-- Servidor: FastAPI (`main.py`) con endpoints para listar, filtrar, agregar y borrar libros.
-- Persistencia: `books.json` (archivo JSON usado como almacenamiento en este prototipo).
-- Seguridad: autenticación básica (env: `API_USER`/`API_PASS`) y limitador de requests en memoria (`RATE_LIMIT_RPS`).
-- Frontend de prueba: `web_client.html` (interfaz estática para pruebas).
-  - Cliente Python de ejemplo: `requests_client.py` (usa la librería `requests` para hacer llamadas a la API).
+Descripción:
+------------
+Esta API está diseñada para gestionar una colección de libros clásicos. 
+Permite a los usuarios realizar diversas operaciones, como buscar y filtrar libros, obtener estadísticas sobre la colección, y más. 
+Los endpoints de la API están protegidos por autenticación básica en algunas acciones, como agregar o eliminar libros.
 
-Recomendaciones y pasos de despliegue
-------------------------------------
-1) Dependencias y entorno
-   - Crear y usar un virtualenv local (no versionar `.venv`):
-     ```powershell
+Archivos:
+---------
+- requirements.txt: Contiene todas las dependencias para poder descargarlas en el entorno virtual facilmente.
+- main.py: Archivo principal de la aplicación. Inicializa la API con FastAPI, configura el middleware CORS, aplica un limitador de 
+      solicitudes por IP, registra las rutas de libros y define el endpoint raíz (/) con información general de la API.
+      También permite ejecutar el servidor con Uvicorn usando variables de entorno para host y puerto.
+- books.json: Archivo de datos que contiene la colección de libros utilizada por la API.
+      Almacena la información de cada libro (título, autor, país, idioma, año, páginas, enlaces e imagen) y funciona como fuente de 
+      datos persistente para las operaciones de lectura, filtrado, creación y eliminación de libros.
+- books.py: Este archivo define los endpoints de la API de libros utilizando FastAPI. 
+      Incluye rutas para listar, buscar, agregar, eliminar libros, y obtener estadísticas sobre la colección. Los filtros de búsqueda 
+      permiten buscar libros por título, autor, idioma, país y número de páginas. También proporciona funcionalidades para obtener una lista 
+      de autores, idiomas y países únicos. La adición y eliminación de libros requieren autenticación básica (Basic Auth) y están protegidas 
+      por un sistema de limitación de solicitudes (rate limiting). Los datos de los libros se gestionan cargándolos y guardándolos desde/hacia 
+      archivos locales.
+- data.py: Contiene funciones para cargar y guardar la lista de libros en books.json. 
+      La función load_books lee el archivo books.json y retorna su contenido, o una lista vacía si el archivo no existe.
+- security.py: Gestiona la autenticación básica HTTP y el control de velocidad (rate limiting) en la API. 
+      La función basic_auth valida las credenciales de usuario y contraseña utilizando variables de entorno. 
+      La función rate_limiter implementa un contador simple de solicitudes por IP, limitando las peticiones a una cantidad configurada por 
+      segundo, y lanza un error HTTP 429 si se excede este límite.
+- web_client.html: Crea una interfaz web para interactuar con la API de Libros. 
+      Permite configurar la URL base de la API y las credenciales de usuario, listar libros con filtros (como título, autor, idioma, etc.), 
+      y agregar nuevos libros a la base de datos.
+- web_client.css: Define el estilo visual para la interfaz web de la API de Libros.
+- client.js: Este archivo JavaScript actúa como el cliente web para interactuar con la API de Libros. 
+      Permite listar, agregar y eliminar libros mediante solicitudes HTTP. Maneja la paginación de los resultados y los filtros de búsqueda 
+      como título, autor, idioma, país y número de páginas. También incluye un sistema de notificaciones (toast) para mostrar mensajes de 
+      éxito o error.
+- requests_client.py: Este archivo contiene un cliente CLI basado en requests que interactúa con la API de Libros desarrollada con FastAPI. 
+      Permite realizar varias acciones sobre la API, como listar libros, obtener detalles de un libro, agregar o eliminar libros, y obtener 
+      estadísticas sobre la biblioteca.
+- .gitignore: Especifica qué archivos y directorios deben ser ignorados por Git al realizar un seguimiento del proyecto.
+
+Recomendaciones y pasos de despliegue:
+--------------------------------------
+1) Levantar la API:
+   - Crear y usar un virtualenv local:
+     ```
      python -m venv .venv
      .\.venv\Scripts\Activate.ps1
      python -m pip install --upgrade pip
      pip install -r requirements.txt
      ```
-
-2) Configuración por variables de entorno
-   - Variables relevantes:
-     - `HOST` (ej. `0.0.0.0`) — host donde bindear el servidor
-     - `PORT` (ej. `8000`) — puerto del servidor
-     - `API_USER`, `API_PASS` — credenciales para endpoints protegidos
-     - `RATE_LIMIT_RPS` — requests por segundo por IP (dev: 5)
-     - `ALLOWED_ORIGINS` — orígenes CORS (coma-separados), ej: `http://mi-front:5500`
-
-3) Arrancar en desarrollo
-   - Ejecutar con autoreload (dev):
-     ```powershell
+   - Si se quiere usar en el mismo dispositivo:
+     ```
      .\.venv\Scripts\python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
      ```
-
-4) Arrancar en LAN / probar desde otro host (dev)
-   - En la máquina servidor:
-     ```powershell
-     $env:HOST = "0.0.0.0"
-     $env:PORT = "8000"
-     $env:ALLOWED_ORIGINS = "http://192.168.1.42:5500"  # origen del frontend
-     .\.venv\Scripts\python -m uvicorn main:app --host 0.0.0.0 --port 8000
+   - Si se quiere usar en una LAN Servidor/Cliente:
      ```
-   - Abrir el frontend de prueba en la otra máquina (ejecutar `python -m http.server 5500` en la carpeta con `web_client.html`) y establecer `API Base URL` a `http://<IP_SERVIDOR>:8000`.
-
-4.a) Paso a paso (comandos PowerShell) — Host servidor y Host cliente
-   - Supongamos:
-     - Máquina SERVIDOR (donde corre la API) tiene IP `192.168.1.10`
-     - Máquina CLIENTE (donde se abre el navegador y sirve la UI estática) tiene IP `192.168.1.42`
-
-   - En la MÁQUINA SERVIDOR (PowerShell):
-     ```powershell
-     # 1) Entrar al directorio del proyecto
-     cd C:\Users\Rober\OneDrive\Escritorio\TP_Redes
-
-     # 2) Configurar variables de entorno para permitir el origen del frontend
-     $env:ALLOWED_ORIGINS = "http://192.168.1.42:5500"
-
-     # (Opcional) ajustar credenciales y rate limit
-     $env:API_USER = "admin"
-     $env:API_PASS = "password"
-     $env:RATE_LIMIT_RPS = "10"
-
-     # 3) Iniciar el servidor enlazando todas las interfaces (accesible desde la LAN)
+     $env:ALLOWED_ORIGINS = "http://IP_CLIENTE:5500"
      .\.venv\Scripts\python -m uvicorn main:app --host 0.0.0.0 --port 8000
      ```
 
-   - En la MÁQUINA CLIENTE (PowerShell):
-     ```powershell
-     # 1) Entrar al directorio donde está web_client.html
-     cd C:\ruta\a\la\carpeta\con\web_client
-
-     # 2) Servir la carpeta local en el puerto 5500
-     .\python -m http.server 5500
-
-     # 3) Abrir en el navegador:
-     #    http://192.168.1.42:5500/web_client.html
-     # (en la UI poner API Base URL: http://192.168.1.10:8000)
+2) Levantar el servidor web:
+   - Crear y usar un virtualenv local:
+     ```
+     python -m venv .venv
+     .\.venv\Scripts\Activate.ps1
+     python -m pip install --upgrade pip
+     pip install -r requirements.txt
+     ```
+   - Si se quiere usar en el mismo dispositivo:
+     ```
+     python -m http.server 5500 --bind 127.0.0.1
+     ```
+   - Si se quiere usar en una LAN Servidor/Cliente:
+     ```
+     python -m http.server 5500
      ```
 
-   - Verificaciones útiles:
-     ```powershell
-     # Desde la MÁQUINA CLIENTE (no usa CORS y comprueba conectividad):
-     Invoke-WebRequest -Uri "http://192.168.1.10:8000/books" -UseBasicParsing
-
-     # En la MÁQUINA SERVIDOR: comprobar que uvicorn está corriendo en 0.0.0.0:8000
-     netstat -ano | Select-String ":8000"
+3) Abrir en el navegador:
+   - Si se quiere usar en el mismo dispositivo:
+     ```
+     http://127.0.0.1:5500/web_client.html
+     ```
+   - Si se quiere usar en una LAN Servidor/Cliente:
+     ```
+     http://IP_CLIENTE:5500/web_client.html
      ```
 
-5) Seguridad y firewall
-   - Abrir el puerto en el firewall si expones en la LAN/Internet (Windows Defender Firewall o reglas del host cloud).
-
-6) Notas sobre limitador y consistencia
-   - El limitador actual es en memoria y por IP: funciona en un único proceso. Si levantas la app con varios workers o múltiples instancias, el contador no será compartido.
-   - Para entornos con múltiples procesos/instancias, usar Redis/central store para rate limiting.
-
-Fin del README.
+4) Seguridad y firewall:
+   - Es posible que al intentar usarlo en una LAN Servidor/Cliente no funcione por el firewall. Desactivelo para usarlo.
 
 Cliente Python `requests`
 -------------------------
-Un pequeño cliente de ejemplo está disponible en `requests_client.py`. Requiere instalar `requests` (ya incluido en `requirements.txt`). Ejemplos:
-``powershell
-python requests_client.py list --base http://127.0.0.1:8000
-python requests_client.py list --base http://127.0.0.1:8000 --author "Jane Austen"
-python requests_client.py get 2 --base http://127.0.0.1:8000
-python requests_client.py add --title "Mi libro" --author "Yo" --pages 123 --base http://127.0.0.1:8000 --user admin --pass password
-python requests_client.py delete 3 --base http://127.0.0.1:8000 --user admin --pass password
-``
+- Ejemplos de uso para un mismo dispositivo:
+  ```
+  python requests_client.py list --base http://127.0.0.1:8000
+  python requests_client.py list --base http://127.0.0.1:8000 --author "Jane Austen"
+  python requests_client.py get 2 --base http://127.0.0.1:8000
+  python requests_client.py add --title "Mi libro" --author "Yo" --pages 123 --base http://127.0.0.1:8000 --user admin --pass password
+  python requests_client.py delete 100 --base http://127.0.0.1:8000 --user admin --pass password
+  ```
 
-Este cliente demuestra la librería `requests` y cumple la consignainvestigar y usar FastAPI, `requests` y `uvicorn`.
+
+Fin del README.
