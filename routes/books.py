@@ -18,27 +18,58 @@ class Book(BaseModel):
 router = APIRouter(prefix="/books", tags=["books"])
 
 @router.get("")
-def get_books(author: Optional[str] = None, title: Optional[str] = None, language: Optional[str] = None, country: Optional[str] = None, pages_min: Optional[int] = None, pages_max: Optional[int] = None):
+@router.get("")
+def get_books(
+    author: Optional[str] = None,
+    title: Optional[str] = None,
+    language: Optional[str] = None,
+    country: Optional[str] = None,
+    pages_min: Optional[int] = None,
+    pages_max: Optional[int] = None
+):
     """Busca y filtra libros por autor, título, idioma, país o cantidad de páginas."""
     books = load_books()
-    # Filtrar por autor
+
     if author:
-        books = [b for b in books if author.lower() in b.get("author", "").lower()]
-    # Filtrar por título (coincidencia parcial)
+        books = [
+            b for b in books
+            if author.lower() in (b.get("author") or "").lower()
+        ]
+
     if title:
-        books = [b for b in books if title.lower() in b.get("title", "").lower()]
-    # Filtrar por idioma
+        books = [
+            b for b in books
+            if title.lower() in (b.get("title") or "").lower()
+        ]
+
     if language:
-        books = [b for b in books if language.lower() in b.get("language", "").lower()]
-    # Filtrar por país
+        books = [
+            b for b in books
+            if language.lower() in (b.get("language") or "").lower()
+        ]
+
     if country:
-        books = [b for b in books if country.lower() in b.get("country", "").lower()]
-    # Filtrar por rango de páginas
+        books = [
+            b for b in books
+            if country.lower() in (b.get("country") or "").lower()
+        ]
+
     if pages_min is not None:
-        books = [b for b in books if b.get("pages", 0) >= pages_min]
+        books = [
+            b for b in books
+            if (b.get("pages") or 0) >= pages_min
+        ]
+
     if pages_max is not None:
-        books = [b for b in books if b.get("pages", 0) <= pages_max]
-    return {"Cantidad": len(books), "Libros": books}
+        books = [
+            b for b in books
+            if (b.get("pages") or 0) <= pages_max
+        ]
+
+    return {
+        "Cantidad": len(books),
+        "Libros": books
+    }
 
 @router.get("/stats")
 def get_stats():
@@ -67,24 +98,29 @@ def get_stats():
 
 @router.get("/authors")
 def get_authors():
-    """Lista todos los autores únicos."""
     books = load_books()
-    authors = sorted(set(b.get("author", "Unknown") for b in books))
+    authors = sorted(
+        {b.get("author") for b in books if b.get("author")}
+    )
     return {"cantidad": len(authors), "autores": authors}
 
 @router.get("/languages")
 def get_languages():
-    """Lista todos los idiomas únicos."""
     books = load_books()
-    languages = sorted(set(b.get("language", "Unknown") for b in books))
+    languages = sorted(
+        {b.get("language") for b in books if b.get("language")}
+    )
     return {"cantidad": len(languages), "idiomas": languages}
+
 
 @router.get("/countries")
 def get_countries():
-    """Lista todos los países únicos."""
     books = load_books()
-    countries = sorted(set(b.get("country", "Unknown") for b in books))
+    countries = sorted(
+        {b.get("country") for b in books if b.get("country")}
+    )
     return {"cantidad": len(countries), "paises": countries}
+
 
 @router.get("/{book_id}")
 def get_book(book_id: int):

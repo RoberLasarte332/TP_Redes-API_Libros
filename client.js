@@ -10,13 +10,13 @@ const PAGE_SIZE = 10;
 // ===============================
 function showToast(message, error = false) {
   const toast = document.getElementById('toast');
-
   toast.textContent = message;
-  toast.className = 'toast show';
+  toast.className = 'toast';
   if (error) toast.classList.add('error');
+  toast.classList.add('show');
 
   setTimeout(() => {
-    toast.className = 'toast';
+    toast.className = 'toast hidden';
   }, 3000);
 }
 
@@ -32,7 +32,7 @@ function authHeader() {
 function setStatus(msg, error = false) {
   const el = document.getElementById('status');
   el.textContent = msg;
-  el.style.color = error ? 'darkred' : 'darkgreen';
+  el.className = error ? 'error' : 'success';
 }
 
 function getBase() {
@@ -42,11 +42,11 @@ function getBase() {
 function readFilters() {
   return {
     title: document.getElementById('filterTitle').value.trim(),
-    author: document.getElementById('filterAuthor').value.trim(),
-    language: document.getElementById('filterLanguage').value.trim(),
-    country: document.getElementById('filterCountry').value.trim(),
-    pages_min: document.getElementById('filterPagesMin').value.trim(),
-    pages_max: document.getElementById('filterPagesMax').value.trim(),
+    author: document.getElementById('filterAuthor').value,
+    language: document.getElementById('filterLanguage').value,
+    country: document.getElementById('filterCountry').value,
+    pages_min: document.getElementById('filterPagesMin').value,
+    pages_max: document.getElementById('filterPagesMax').value,
   };
 }
 
@@ -56,6 +56,33 @@ function buildQuery(params) {
     if (params[k]) q.append(k, params[k]);
   }
   return q.toString();
+}
+
+// ===============================
+// LOAD SELECT OPTIONS
+// ===============================
+async function loadSelect(id, endpoint, label) {
+  const select = document.getElementById(id);
+  select.innerHTML = `<option value="">Todos</option>`;
+
+  try {
+    const res = await fetch(`${getBase()}${endpoint}`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    const values = data.autores || data.idiomas || data.paises || [];
+
+    values.forEach((v) => {
+      if (!v) return;
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      select.appendChild(opt);
+    });
+  } catch (e) {
+    console.error(`Error cargando ${label}`, e);
+  }
 }
 
 // ===============================
@@ -72,13 +99,12 @@ async function listBooks() {
     if (!res.ok) return setStatus('Error al listar libros', true);
 
     const data = await res.json();
-    allBooks = Array.isArray(data) ? data : data.Libros || [];
+    allBooks = data.Libros || [];
     currentPage = 1;
 
     renderPage();
     setStatus(`Listo — ${allBooks.length} libros encontrados.`);
   } catch (e) {
-    console.error(e);
     setStatus('Error de conexión con la API', true);
   }
 }
@@ -86,9 +112,7 @@ async function listBooks() {
 function renderPage() {
   const start = (currentPage - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE;
-  const pageBooks = allBooks.slice(start, end);
-
-  renderBooks(pageBooks);
+  renderBooks(allBooks.slice(start, end));
 
   const totalPages = Math.max(1, Math.ceil(allBooks.length / PAGE_SIZE));
   document.getElementById(
@@ -114,7 +138,8 @@ function renderBooks(books) {
     div.innerHTML = `
       <strong>${b.title}</strong> — ${b.author || '—'}<br>
       Páginas: ${b.pages || '—'} — Idioma: ${b.language || '—'}<br>
-      <button class="del-btn" data-id="${b.id ?? i}">Borrar</button>
+      País: ${b.country || '—'}<br>
+      <button class="del-btn" data-id="${i}">Borrar</button>
     `;
     container.appendChild(div);
   });
@@ -128,25 +153,20 @@ function renderBooks(books) {
 // CRUD
 // ===============================
 async function deleteBook(id) {
-  const url = `${getBase()}/books/${id}`;
-  setStatus('Eliminando libro...');
-
   try {
-    const res = await fetch(url, {
+    const res = await fetch(`${getBase()}/books/${id}`, {
       method: 'DELETE',
       headers: authHeader(),
     });
 
     if (!res.ok) {
       showToast('Error al eliminar el libro', true);
-      return setStatus('Error al borrar el libro', true);
+      return;
     }
 
     listBooks();
-    setStatus('Libro eliminado correctamente.');
     showToast('🗑 Libro eliminado con éxito', true);
-  } catch (e) {
-    setStatus('Error de conexión con la API', true);
+  } catch {
     showToast('Error de conexión', true);
   }
 }
@@ -154,17 +174,16 @@ async function deleteBook(id) {
 async function addBook() {
   const payload = {
     title: document.getElementById('title').value.trim(),
-    author: document.getElementById('author').value.trim() || null,
+    author: document.getElementById('author').value || null,
     pages: parseInt(document.getElementById('pages').value) || null,
-    language: document.getElementById('language').value.trim() || null,
+    language: document.getElementById('language').value || null,
+    country: document.getElementById('country').value || null,
   };
 
   if (!payload.title) {
     showToast('El título es obligatorio', true);
-    return setStatus('El título es obligatorio', true);
+    return;
   }
-
-  setStatus('Agregando libro...');
 
   try {
     const res = await fetch(`${getBase()}/books`, {
@@ -178,28 +197,32 @@ async function addBook() {
 
     if (!res.ok) {
       showToast('Error al crear el libro', true);
-      return setStatus('Error al agregar el libro', true);
+      return;
     }
 
     document.getElementById('title').value = '';
-    document.getElementById('author').value = '';
     document.getElementById('pages').value = '';
-    document.getElementById('language').value = '';
 
     listBooks();
-    setStatus('Libro agregado correctamente.');
+    loadAllSelects();
     showToast('📘 Libro creado con éxito');
-  } catch (e) {
-    setStatus('Error de conexión con la API', true);
+  } catch {
     showToast('Error de conexión', true);
   }
 }
 
 // ===============================
-// EVENTS
+// INIT
 // ===============================
+function loadAllSelects() {
+  loadSelect('filterAuthor', '/books/authors', 'author');
+  loadSelect('filterLanguage', '/books/languages', 'language');
+  loadSelect('filterCountry', '/books/countries', 'country');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnList').onclick = listBooks;
+  document.getElementById('btnAdd').onclick = addBook;
 
   document.getElementById('btnClearFilters').onclick = () => {
     [
@@ -213,8 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
     listBooks();
   };
 
-  document.getElementById('btnAdd').onclick = addBook;
-
   document.getElementById('prevPage').onclick = () => {
     if (currentPage > 1) {
       currentPage--;
@@ -223,12 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('nextPage').onclick = () => {
-    const totalPages = Math.ceil(allBooks.length / PAGE_SIZE);
-    if (currentPage < totalPages) {
+    if (currentPage * PAGE_SIZE < allBooks.length) {
       currentPage++;
       renderPage();
     }
   };
 
+  loadAllSelects();
   listBooks();
 });
