@@ -1,21 +1,4 @@
 #!/usr/bin/env python3
-"""
-Simple CLI client that uses `requests` to interact with the FastAPI Books API.
-
-Usage examples:
-  python requests_client.py --base http://127.0.0.1:8000 list
-
-  python requests_client.py --base http://127.0.0.1:8000 get 2
-
-  python requests_client.py --base http://127.0.0.1:8000 --user admin --pass password add --title "Libro"
-
-  python requests_client.py --base http://127.0.0.1:8000 --user admin --pass password delete 100
-
-  python requests_client.py --base http://127.0.0.1:8000 stats
-
-  python requests_client.py --base http://127.0.0.1:8000 authors
-
-"""
 import argparse
 import json
 import sys
@@ -23,14 +6,12 @@ from getpass import getpass
 import requests
 from requests.auth import HTTPBasicAuth
 
-
 def pretty_print(resp):
     try:
         data = resp.json()
         print(json.dumps(data, indent=2, ensure_ascii=False))
     except ValueError:
         print(resp.text)
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Requests-based client for the Books API")
@@ -64,18 +45,17 @@ def parse_args():
     del_p = sub.add_parser('delete', help='Delete a book by index (Basic Auth)')
     del_p.add_argument('id', type=int)
 
-    # other endpoints
+    # otros endpoints
     sub.add_parser('stats', help='Get library stats')
     sub.add_parser('authors', help='List authors')
     sub.add_parser('languages', help='List languages')
     sub.add_parser('countries', help='List countries')
 
-    # global args
+    # argumentos globales
     parser.add_argument('--base', default='http://127.0.0.1:8000', help='Base URL of the API')
     parser.add_argument('--user', help='Username for Basic Auth')
     parser.add_argument('--pass', dest='password', help='Password for Basic Auth')
     return parser.parse_args()
-
 
 def run():
     args = parse_args()
@@ -104,7 +84,7 @@ def run():
 
         elif args.cmd == 'add':
             payload = {k: getattr(args, k) for k in ['title', 'author', 'pages', 'country', 'language', 'year', 'link', 'imageLink']}
-            # remove None values
+            # elimina los valores None
             payload = {k: v for k, v in payload.items() if v is not None}
             resp = requests.post(base + '/books', json=payload, auth=auth, timeout=5)
             resp.raise_for_status()
@@ -152,7 +132,6 @@ def run():
     except Exception as exc:
         print('Error: ', exc)
         sys.exit(1)
-
 
 if __name__ == '__main__':
     run()

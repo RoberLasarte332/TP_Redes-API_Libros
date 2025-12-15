@@ -61,13 +61,13 @@ def read_root():
             "GET /books?language=English - Filtrar por idioma",
             "GET /books?country=Spain - Filtrar por país",
             "GET /books?pages_min=200&pages_max=500 - Filtrar por rango de páginas",
-            "POST /books - Agregar un libro (Basic Auth, protegido)",
-            "DELETE /books/{id} - Eliminar un libro por índice (Basic Auth, protegido)",
             "GET /books/{id} - Buscar un libro específico por índice",
             "GET /books/stats - Estadísticas de la colección",
             "GET /books/authors - Listar todos los autores",
             "GET /books/languages - Listar todos los idiomas",
             "GET /books/countries - Listar todos los países",
+            "POST /books - Agregar un libro (Basic Auth, protegido)",
+            "DELETE /books/{id} - Eliminar un libro por índice (Basic Auth, protegido)",
             "GET /docs - Documentación de la API (Swagger UI)",
             "Nota: endpoints POST/DELETE requieren Basic Auth; existe limitación de requests por IP (RATE_LIMIT_RPS env var)"
         ]

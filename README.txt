@@ -95,11 +95,13 @@ Cliente Python `requests`
 -------------------------
 - Ejemplos de uso para un mismo dispositivo:
   ```
-  python requests_client.py list --base http://127.0.0.1:8000
-  python requests_client.py list --base http://127.0.0.1:8000 --author "Jane Austen"
-  python requests_client.py get 2 --base http://127.0.0.1:8000
-  python requests_client.py add --title "Mi libro" --author "Yo" --pages 123 --base http://127.0.0.1:8000 --user admin --pass password
-  python requests_client.py delete 100 --base http://127.0.0.1:8000 --user admin --pass password
+  python requests_client.py --base http://127.0.0.1:8000 list
+  python requests_client.py --base http://127.0.0.1:8000 list --author "Jane Austen"
+  python requests_client.py --base http://127.0.0.1:8000 get 2
+  python requests_client.py --base http://127.0.0.1:8000 stats
+  python requests_client.py --base http://127.0.0.1:8000 authors
+  python requests_client.py --base http://127.0.0.1:8000 --user admin --pass password add --title "Mi libro" --author "Yo" --pages 123
+  python requests_client.py --base http://127.0.0.1:8000 --user admin --pass password delete 100
   ```
 
 

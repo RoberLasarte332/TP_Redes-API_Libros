@@ -18,7 +18,6 @@ class Book(BaseModel):
 router = APIRouter(prefix="/books", tags=["books"])
 
 @router.get("")
-@router.get("")
 def get_books(
     author: Optional[str] = None,
     title: Optional[str] = None,
@@ -98,6 +97,7 @@ def get_stats():
 
 @router.get("/authors")
 def get_authors():
+    """Retorna la lista de autores únicos en la colección de libros."""
     books = load_books()
     authors = sorted(
         {b.get("author") for b in books if b.get("author")}
@@ -106,6 +106,7 @@ def get_authors():
 
 @router.get("/languages")
 def get_languages():
+    """Retorna la lista de idiomas únicos en la colección de libros."""
     books = load_books()
     languages = sorted(
         {b.get("language") for b in books if b.get("language")}
@@ -115,6 +116,7 @@ def get_languages():
 
 @router.get("/countries")
 def get_countries():
+    """Retorna la lista de países únicos en la colección de libros."""
     books = load_books()
     countries = sorted(
         {b.get("country") for b in books if b.get("country")}
