@@ -1,87 +1,108 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <title>Books API Web Client</title>
-  <link rel="stylesheet" href="web_client.css" />
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <title>Books API Web Client</title>
+    <link rel="stylesheet" href="web_client.css" />
+  </head>
 
-<body>
-  <h1>📚 Books API – Web Client</h1>
+  <body>
+    <h1>📚 Books API – Web Client</h1>
 
-  <!-- CONFIG -->
-  <section>
-    <h3>Configuración</h3>
+    <!-- CONFIG -->
+    <section>
+      <h3>Configuración</h3>
 
-    <div class="field">
-      <label>API Base URL:</label>
-      <input id="baseUrl" value="http://127.0.0.1:8000" />
-    </div>
+      <div class="field">
+        <label>API Base URL:</label>
+        <input id="baseUrl" value="http://127.0.0.1:8000" />
+      </div>
 
-    <div class="field">
-      <label>Usuario:</label>
-      <input id="user" value="admin" />
-    </div>
+      <div class="field">
+        <label>Usuario:</label>
+        <input id="user" value="admin" />
+      </div>
 
-    <div class="field">
-      <label>Contraseña:</label>
-      <input id="pass" value="password" type="password" />
-    </div>
+      <div class="field">
+        <label>Contraseña:</label>
+        <input id="pass" value="password" type="password" />
+      </div>
 
-    <div id="status"></div>
-  </section>
+      <div id="status"></div>
+    </section>
 
-  <!-- LIST BOOKS -->
-  <section>
-    <h3>Listar libros</h3>
+    <!-- LIST BOOKS -->
+    <section>
+      <h3>Listar libros</h3>
 
-    <div class="grid-2">
-      <div class="field"><label>Título:</label><input id="filterTitle"></div>
-      <div class="field"><label>Autor:</label><input id="filterAuthor"></div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Título:</label><input id="filterTitle" />
+        </div>
+        <div class="field">
+          <label>Autor:</label><input id="filterAuthor" />
+        </div>
 
-      <div class="field"><label>Idioma:</label><input id="filterLanguage"></div>
-      <div class="field"><label>País:</label><input id="filterCountry"></div>
+        <div class="field">
+          <label>Idioma:</label><input id="filterLanguage" />
+        </div>
+        <div class="field">
+          <label>País:</label><input id="filterCountry" />
+        </div>
 
-      <div class="field"><label>Páginas mín.:</label><input id="filterPagesMin" type="number"></div>
-      <div class="field"><label>Páginas máx.:</label><input id="filterPagesMax" type="number"></div>
-    </div>
+        <div class="field">
+          <label>Páginas mín.:</label
+          ><input id="filterPagesMin" type="number" />
+        </div>
+        <div class="field">
+          <label>Páginas máx.:</label
+          ><input id="filterPagesMax" type="number" />
+        </div>
+      </div>
 
-    <div class="btn-row">
-      <button id="btnList">Listar</button>
-      <button id="btnClearFilters" class="secondary">Limpiar</button>
-    </div>
+      <div class="btn-row">
+        <button id="btnList">Listar</button>
+        <button id="btnClearFilters" class="secondary">Limpiar</button>
+      </div>
 
-    <div id="books"></div>
-  </section>
+      <div id="books"></div>
+      <div class="pagination">
+        <button id="prevPage" class="secondary">⬅ Anterior</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage" class="secondary">Siguiente ➡</button>
+      </div>
+    </section>
 
-  <!-- ADD BOOK -->
-  <section>
-    <h3>Agregar libro</h3>
+    <!-- ADD BOOK -->
+    <section>
+      <h3>Agregar libro</h3>
 
-    <div class="field">
-      <label>Título:</label>
-      <input id="title" />
-    </div>
+      <div class="field">
+        <label>Título:</label>
+        <input id="title" />
+      </div>
 
-    <div class="field">
-      <label>Autor:</label>
-      <input id="author" />
-    </div>
+      <div class="field">
+        <label>Autor:</label>
+        <input id="author" />
+      </div>
 
-    <div class="field">
-      <label>Páginas:</label>
-      <input id="pages" type="number" />
-    </div>
+      <div class="field">
+        <label>Páginas:</label>
+        <input id="pages" type="number" />
+      </div>
 
-    <div class="field">
-      <label>Idioma:</label>
-      <input id="language" />
-    </div>
+      <div class="field">
+        <label>Idioma:</label>
+        <input id="language" />
+      </div>
 
-    <button id="btnAdd">Agregar</button>
-    <div id="addResult"></div>
-  </section>
+      <button id="btnAdd">Agregar</button>
+      <div id="addResult"></div>
+    </section>
 
-  <script src="client.js"></script>
-</body>
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="client.js"></script>
+  </body>
 </html>
