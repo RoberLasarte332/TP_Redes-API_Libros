@@ -33,10 +33,6 @@ h3 {
   color: #6b4e3d;
 }
 
-/* ===============================
-   FORM
-   =============================== */
-
 .field {
   margin-bottom: 12px;
 }
@@ -47,7 +43,6 @@ label {
   margin-bottom: 3px;
 }
 
-/* input y select unificados */
 input,
 select {
   width: 100%;
@@ -65,10 +60,6 @@ select:focus {
   border-color: #b48a4a;
   box-shadow: 0 0 0 2px rgba(180, 138, 74, 0.2);
 }
-
-/* ===============================
-   BUTTONS
-   =============================== */
 
 button {
   background: #b48a4a;
@@ -88,38 +79,17 @@ button:hover {
   background: #9e7c3e;
 }
 
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%233a2f2a' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
-
-  padding-right: 35px;
-}
-
 .btn-row {
   display: flex;
   gap: 10px;
   margin: 10px 0;
 }
 
-/* ===============================
-   GRID
-   =============================== */
-
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-
-/* ===============================
-   BOOK LIST
-   =============================== */
 
 .book {
   background: #fff4e0;
@@ -133,10 +103,6 @@ select {
   font-size: 18px;
   color: #3c2d23;
 }
-
-/* ===============================
-   DELETE BUTTON
-   =============================== */
 
 .del-btn {
   margin-top: 8px;
@@ -152,10 +118,6 @@ select {
   background: #a93226;
 }
 
-/* ===============================
-   PAGINATION
-   =============================== */
-
 .pagination {
   display: flex;
   justify-content: center;
@@ -168,10 +130,6 @@ select {
   font-weight: bold;
   color: #6b4e3d;
 }
-
-/* ===============================
-   TOAST
-   =============================== */
 
 .toast {
   position: fixed;
@@ -198,10 +156,6 @@ select {
   pointer-events: none;
   transform: translateY(20px);
 }
-
-/* ===============================
-   STATUS
-   =============================== */
 
 #status {
   margin-top: 12px;

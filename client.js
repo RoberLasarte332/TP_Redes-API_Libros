@@ -6,7 +6,7 @@ let currentPage = 1;
 const PAGE_SIZE = 10;
 
 // ===============================
-// TOAST (CARTEL)
+// TOAST
 // ===============================
 function showToast(message, error = false) {
   const toast = document.getElementById('toast');
